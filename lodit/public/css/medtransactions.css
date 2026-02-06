@@ -1,0 +1,37 @@
+body {
+    background-color: #1e1e1e !important;
+}
+
+.medtx-table td,
+.medtx-table th {
+    border-color: #444 !important;
+}
+
+.medtx-table thead th {
+    background-color: #1e1e1e !important;
+    color: black !important;
+}
+
+.medtx-btn {
+    border-radius: 10px !important;
+}
+
+.medtx-itemlist {
+    margin: 0;
+    padding-left: 20px;
+}
+
+@media print {
+    a.medtx-btn,
+    button.medtx-btn,
+    form,
+    .collapse,
+    hr {
+        display: none !important;
+    }
+
+    body {
+        background: #fff !important;
+        color: #000 !important;
+    }
+}

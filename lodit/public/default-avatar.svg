@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <style>
+      .default-avatar-bg { fill: #e0e0e0; }
+      .default-avatar-circle { fill: #999999; }
+    </style>
+  </defs>
+  <!-- Background -->
+  <rect width="200" height="200" class="default-avatar-bg"/>
+  <!-- Head -->
+  <circle cx="100" cy="70" r="35" class="default-avatar-circle"/>
+  <!-- Body -->
+  <ellipse cx="100" cy="140" rx="45" ry="50" class="default-avatar-circle"/>
+</svg>

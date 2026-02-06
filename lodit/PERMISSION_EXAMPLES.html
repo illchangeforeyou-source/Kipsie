@@ -1,0 +1,307 @@
+<!-- EXAMPLE: How to Use the Permission System in Your Views -->
+
+<!-- EXAMPLE 1: Simple Button Visibility -->
+<button class="btn btn-primary" data-permission="view_medicines">
+    <i class="bi bi-eye"></i> View Medicines
+</button>
+
+<!-- EXAMPLE 2: Multiple Buttons with Different Permissions -->
+<div class="action-buttons">
+    <button class="btn btn-info" data-permission="view_orders">View Orders</button>
+    <button class="btn btn-success" data-permission="create_medicine">Add Medicine</button>
+    <button class="btn btn-warning" data-permission="edit_medicine">Edit</button>
+    <button class="btn btn-danger" data-permission="delete_medicine">Delete</button>
+</div>
+
+<!-- EXAMPLE 3: Complex UI with Sections -->
+<div class="admin-section">
+    <!-- Sales Reports - Only for users with permission -->
+    <div class="card" data-permission="view_sales_report">
+        <div class="card-header">Sales Reports</div>
+        <div class="card-body">
+            <p>Total Revenue: $10,000</p>
+        </div>
+    </div>
+
+    <!-- User Management - Only for Super Admins -->
+    <div class="card" data-permission="manage_users">
+        <div class="card-header">User Management</div>
+        <div class="card-body">
+            <table>
+                <!-- user table -->
+            </table>
+        </div>
+    </div>
+
+    <!-- Database Operations - Only for Owners -->
+    <div class="card" data-permission="backup_database">
+        <div class="card-header">Database Management</div>
+        <div class="card-body">
+            <button data-permission="backup_database">Backup Database</button>
+            <button data-permission="reset_database">Reset Database</button>
+        </div>
+    </div>
+</div>
+
+<!-- EXAMPLE 4: Conditional JavaScript -->
+<script>
+    // Check if user can perform an action before showing a button
+    document.addEventListener('DOMContentLoaded', function() {
+        if (checkPermission('create_medicine')) {
+            // Show the add medicine button
+            document.getElementById('add-medicine-btn').style.display = 'block';
+        }
+        
+        if (checkPermission('delete_medicine')) {
+            // Add delete functionality to tables
+            setupDeleteButtons();
+        }
+        
+        if (!checkPermission('edit_order_status')) {
+            // Disable order status editor
+            document.querySelectorAll('.order-status-select').forEach(el => {
+                el.disabled = true;
+                el.title = 'You do not have permission to edit order status';
+            });
+        }
+    });
+</script>
+
+<!-- EXAMPLE 5: Admin Dashboard -->
+<div class="admin-dashboard">
+    <h1>Admin Dashboard</h1>
+    
+    <!-- Stats - everyone can see -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <h3>Total Users</h3>
+            <p>{{ totalUsers }}</p>
+        </div>
+    </div>
+    
+    <!-- Admin Actions - only with permissions -->
+    <div class="admin-actions">
+        <h2>Admin Actions</h2>
+        
+        <button class="btn btn-primary" data-permission="manage_users">
+            <i class="bi bi-people"></i> Manage Users
+        </button>
+        
+        <button class="btn btn-primary" data-permission="manage_permissions">
+            <i class="bi bi-shield-lock"></i> Manage Permissions
+        </button>
+        
+        <button class="btn btn-primary" data-permission="backup_database">
+            <i class="bi bi-cloud-arrow-down"></i> Backup Database
+        </button>
+    </div>
+</div>
+
+<!-- EXAMPLE 6: Table with Permission-Based Actions -->
+<table class="table">
+    <thead>
+        <tr>
+            <th>Medicine Name</th>
+            <th>Price</th>
+            <th>Stock</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Aspirin</td>
+            <td>$5.00</td>
+            <td>100</td>
+            <td>
+                <!-- View is usually available -->
+                <button class="btn btn-sm btn-info">View</button>
+                
+                <!-- Edit only visible with permission -->
+                <button class="btn btn-sm btn-warning" data-permission="edit_medicine">
+                    Edit
+                </button>
+                
+                <!-- Delete only visible with permission -->
+                <button class="btn btn-sm btn-danger" data-permission="delete_medicine">
+                    Delete
+                </button>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<!-- EXAMPLE 7: Using JavaScript Functions -->
+<script>
+    function deleteItem(id) {
+        // Check permission before allowing deletion
+        if (!checkPermission('delete_medicine')) {
+            alert('You do not have permission to delete items');
+            return;
+        }
+        
+        // Proceed with deletion
+        confirm('Delete this item?') && fetch(`/medicines/${id}`, {
+            method: 'DELETE'
+        });
+    }
+    
+    function editItem(id) {
+        // Use the enforcer directly
+        if (permissionEnforcer.hasPermission('edit_medicine')) {
+            window.location.href = `/medicines/${id}/edit`;
+        } else {
+            alert('You do not have permission to edit items');
+        }
+    }
+</script>
+
+<!-- EXAMPLE 8: Checking Multiple Permissions -->
+<script>
+    // Check if user has ALL these permissions
+    if (permissionEnforcer.hasAllPermissions(['view_medicines', 'edit_medicine', 'create_medicine'])) {
+        // User is a medicines manager
+        console.log('User can fully manage medicines');
+    }
+    
+    // Check if user has ANY of these permissions
+    if (permissionEnforcer.hasAnyPermission(['view_reports', 'view_analytics', 'view_dashboard'])) {
+        // User can see at least one reporting feature
+        console.log('User has access to reports');
+    }
+</script>
+
+<!-- EXAMPLE 9: Dynamic Permission Checking -->
+<script>
+    // Get all user's permissions
+    const allPermissions = permissionEnforcer.getAllPermissions();
+    
+    // Log them
+    console.log('User Permissions:', allPermissions);
+    
+    // Iterate through permissions
+    Object.entries(allPermissions).forEach(([permission, hasAccess]) => {
+        console.log(`${permission}: ${hasAccess ? '✅' : '❌'}`);
+    });
+</script>
+
+<!-- EXAMPLE 10: Controlling Elements Programmatically -->
+<script>
+    // Hide button if no permission
+    permissionEnforcer.hideIfNoPermission('#delete-btn', 'delete_medicine');
+    
+    // Show button only if has permission
+    permissionEnforcer.showIfHasPermission('#admin-panel', 'manage_permissions');
+    
+    // Disable button instead of hiding
+    permissionEnforcer.controlElement('#export-btn', 'export_reports', true);
+    
+    // Reload permissions after they change
+    permissionEnforcer.reload();
+</script>
+
+<!-- EXAMPLE 11: Permission-Based Classes -->
+<div id="user-actions">
+    <!-- Use CSS classes to style hidden items -->
+    <button class="action-btn" data-permission="edit_medicine">
+        Edit
+    </button>
+</div>
+
+<style>
+    /* Style elements that are hidden by permissions */
+    [data-hidden-by-permission] {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+    
+    /* Or completely hide them */
+    [data-permission]:not([style*="display: "]) {
+        /* This shows items that don't have permission hiding applied */
+    }
+</style>
+
+<!-- EXAMPLE 12: Real-World Medicine Management Page -->
+@extends('layouts.app')
+
+@section('content')
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col">
+            <h1>Medicines Management</h1>
+        </div>
+        <div class="col text-end">
+            <!-- Add button only visible to admins/managers -->
+            <a href="/medicines/create" class="btn btn-success" data-permission="create_medicine">
+                <i class="bi bi-plus"></i> Add New Medicine
+            </a>
+        </div>
+    </div>
+
+    <table class="table table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>Medicine Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($medicines as $medicine)
+            <tr>
+                <td>{{ $medicine->name }}</td>
+                <td>{{ $medicine->category }}</td>
+                <td>${{ number_format($medicine->price, 2) }}</td>
+                <td>{{ $medicine->stock }}</td>
+                <td>
+                    <!-- View is always available -->
+                    <a href="/medicines/{{ $medicine->id }}" class="btn btn-sm btn-info">
+                        <i class="bi bi-eye"></i> View
+                    </a>
+                    
+                    <!-- Edit - only for those with permission -->
+                    <a href="/medicines/{{ $medicine->id }}/edit" 
+                       class="btn btn-sm btn-warning" 
+                       data-permission="edit_medicine">
+                        <i class="bi bi-pencil"></i> Edit
+                    </a>
+                    
+                    <!-- Delete - only for admins -->
+                    <button class="btn btn-sm btn-danger" 
+                            data-permission="delete_medicine"
+                            onclick="deleteMedicine({{ $medicine->id }})">
+                        <i class="bi bi-trash"></i> Delete
+                    </button>
+                </td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function deleteMedicine(id) {
+        if (checkPermission('delete_medicine')) {
+            if (confirm('Delete this medicine?')) {
+                fetch(`/medicines/${id}`, { method: 'DELETE' })
+                    .then(() => location.reload());
+            }
+        }
+    }
+</script>
+@endsection
+
+<!-- SUMMARY OF ATTRIBUTES YOU CAN USE: -->
+<!-- data-permission="permission_key" - Hide if user doesn't have permission -->
+
+<!-- PERMISSION KEYS REFERENCE: -->
+view_dashboard, view_analytics,
+view_medicines, create_medicine, edit_medicine, delete_medicine,
+view_orders, edit_order_status, process_payment,
+view_users, manage_users, assign_roles, manage_permissions,
+view_sales_report, view_stock_report, export_reports,
+view_consultations, answer_consultations,
+view_deliveries, manage_delivery_status,
+view_prescriptions, validate_prescriptions,
+backup_database, reset_database, manage_database
